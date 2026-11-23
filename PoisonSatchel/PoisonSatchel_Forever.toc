@@ -1,0 +1,12 @@
+## Interface: 16001
+## Game: forever
+## Title: Poison Satchel
+## IconTexture: Interface\AddOns\PoisonSatchel\Textures\Logo
+## Version: 0.3.8
+## Author: Chris
+## Notes: Buy ingredients and craft learned rogue poisons.
+## SavedVariablesPerCharacter: PoisonSatchelDB, VenomSatchelDB
+Launcher.lua
+Supply.lua
+ActionBar.lua
+Panel.lua

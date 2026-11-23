@@ -1,0 +1,24 @@
+name: Build addon release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build addon ZIP
+        shell: pwsh
+        run: ./scripts/Build-Addon.ps1 -Tag $env:GITHUB_REF_NAME
+      - name: Publish ZIP on GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "dist/PoisonSatchel-${GITHUB_REF_NAME}.zip" --verify-tag --title "Poison Satchel $GITHUB_REF_NAME" --generate-notes
