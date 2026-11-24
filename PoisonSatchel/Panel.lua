@@ -192,13 +192,15 @@ function ns.open()
     ns.refresh()
 end
 
-local optionsCategory, barSetting
+local optionsCategory, barSetting, reminderSetting
 
 function ns.buildMenu(root)
     root:CreateButton("Open poison manager", ns.open)
     root:CreateDivider()
     root:CreateCheckbox("Show poison action bar", function() return barSetting:GetValue() end,
         function() barSetting:SetValue(not barSetting:GetValue()) end)
+    root:CreateCheckbox("Poison expiration reminders", function() return reminderSetting:GetValue() end,
+        function() reminderSetting:SetValue(not reminderSetting:GetValue()) end)
     root:CreateDivider()
     root:CreateButton("Settings", function()
         Settings.OpenToCategory(optionsCategory:GetID())
@@ -221,6 +223,7 @@ local function registerOptions()
             function(value)
                 ns.db[key] = value
                 if key == "showActionBar" then ns.updateActionBar() end
+                if key == "showPoisonReminders" and not value then ns.setPoisonWarning("") end
                 ns.refresh()
             end)
         Settings.CreateCheckbox(category, setting, tooltip)
@@ -229,6 +232,8 @@ local function registerOptions()
     checkbox("autoOpen", "Open at poison vendors", true, "Open the poison manager when visiting a poison supplier.")
     checkbox("showAllRanks", "Show all learned ranks", false, "Include lower ranks in the poison manager.")
     barSetting = checkbox("showActionBar", "Show poison action bar", true, "Show poison items and the Poisons profession shortcut on rogues.")
+    reminderSetting = checkbox("showPoisonReminders", "Poison expiration reminders", true,
+        "Show a countdown under the poison bar and a private chat reminder when a poison is about to expire.")
     Settings.RegisterAddOnCategory(category)
     optionsCategory = category
 end
@@ -245,6 +250,7 @@ events:SetScript("OnEvent", function(self, event, arg, detail)
         ns.db.recipes = ns.db.recipes or {}
         if ns.db.autoOpen == nil then ns.db.autoOpen = true end
         if ns.db.showActionBar == nil then ns.db.showActionBar = true end
+        if ns.db.showPoisonReminders == nil then ns.db.showPoisonReminders = true end
         registerOptions()
         ns.button = ns.launcher("Poison Satchel", ns.db, ns.open, ns.menu)
         SLASH_POISONSATCHEL1 = "/venom"
@@ -288,6 +294,7 @@ events:SetScript("OnEvent", function(self, event, arg, detail)
         ns.advance()
     elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED" then
         ns.updateActionBar()
+        if event == "PLAYER_ENTERING_WORLD" then ns.startPoisonWarnings() end
     elseif event == "PLAYER_REGEN_DISABLED" then
         ns.pendingCraft = nil
         if ns.order then ns.stop("Purchase stopped in combat.") end

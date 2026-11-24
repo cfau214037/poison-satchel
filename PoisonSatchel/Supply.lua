@@ -3,6 +3,15 @@ PoisonSatchel = ns
 local trade = C_TradeSkillUI
 local POISONS = 40
 
+-- Item IDs within each family are ordered from lowest to highest rank.
+ns.poisonFamilies = {
+    {6947, 6949, 6950, 8926, 8927, 8928}, -- Instant
+    {2892, 2893, 8984, 8985, 20844},      -- Deadly
+    {10918, 10920, 10921, 10922},         -- Wound
+    {3775, 3776},                         -- Crippling
+    {5237, 6951, 9186},                   -- Mind-numbing
+}
+
 function ns.ownPoisons()
     if not trade or not trade.GetBaseProfessionInfo then return false end
     if (trade.IsTradeSkillLinked and trade.IsTradeSkillLinked())

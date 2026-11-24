@@ -12,22 +12,28 @@ Poison Satchel helps rogues in **World of Warcraft Forever** restock and apply p
 
 The manager shows the highest learned rank of each poison by default. Enable **Show all learned ranks** to prepare a lower rank.
 
+## Apply poison from the character sheet
+
+Outside combat, right-click an equipped main-hand or off-hand weapon to see the poisons and ranks in your bags. Click a poison to apply it to that weapon. If WoW asks whether to replace an existing coating, confirm in the game prompt.
+
 ## Poison action bar
 
-The bar has one slot each for Instant, Deadly, Wound, Crippling, and Mind-numbing Poison. A colored icon shows the highest rank in your bags and how many you have of that rank. A gray icon means you have none of that poison. Click a stocked poison, then select the weapon to coat.
+The bar has one slot each for Instant, Deadly, Wound, Crippling, and Mind-numbing Poison. A colored icon shows the highest rank in your bags and how many you have of that rank. A gray icon means you have none of that poison. Left-click or right-click a stocked poison, then select the weapon to coat.
 
 Click the **Poisons crafting icon** at the end of the bar to open the profession. Right-drag that icon to move the bar. Its position is saved per character.
+
+During the last minute of a poison coating, an amber countdown under the bar shows which hand needs attention. When the coating runs out, a muted **Poison expired** label stays until you reapply or swap weapons. Each coating also gets one private chat reminder during its last minute, even with the bar hidden.
 
 ## Minimap and settings
 
 | Control | Action |
 | --- | --- |
 | Left-click the minimap icon | Open the poison manager. |
-| Right-click the minimap icon | Open the manager, toggle the poison bar, or jump to addon settings. |
+| Right-click the minimap icon | Open the manager, toggle the poison bar or expiration reminders, or jump to addon settings. |
 | Drag the minimap icon | Move it around the minimap. |
 | Type `/poisonsatchel` or `/venom` | Open the poison manager. |
 
-All three preferences are under **Settings → AddOns → Poison Satchel**. Action bar visibility changes take effect after combat if you toggle the bar during a fight.
+Preferences are under **Settings → AddOns → Poison Satchel**. **Poison expiration reminders** controls both the countdown and private chat messages. It is enabled by default and saved per character. Action bar visibility changes take effect after combat if you toggle the bar during a fight.
 
 ## Publishing a release
 

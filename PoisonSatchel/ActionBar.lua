@@ -1,16 +1,13 @@
 local _, ns = ...
 
--- Each slot stays in place. Item IDs are ordered from lowest to highest rank.
-local families = {
-    {6947, 6949, 6950, 8926, 8927, 8928}, -- Instant
-    {2892, 2893, 8984, 8985, 20844},      -- Deadly
-    {10918, 10920, 10921, 10922},         -- Wound
-    {3775, 3776},                         -- Crippling
-    {5237, 6951, 9186},                   -- Mind-numbing
-}
+local families = ns.poisonFamilies
 
 local bar, buttons = nil, {}
 local size, spacing = 32, 3
+
+function ns.setPoisonWarning(text)
+    if bar and bar.poisonWarning:GetText() ~= text then bar.poisonWarning:SetText(text) end
+end
 
 local function makeButton(index, template)
     local button = CreateFrame("Button", nil, bar, template)
@@ -28,6 +25,10 @@ local function createBar()
     bar:SetSize((#families + 1) * (size + spacing) - spacing, size)
     bar:SetClampedToScreen(true)
     bar:SetMovable(true)
+    bar.poisonWarning = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    bar.poisonWarning:SetPoint("TOP", bar, "BOTTOM", 0, -4)
+    bar.poisonWarning:SetJustifyH("CENTER")
+    bar.poisonWarning:SetShadowOffset(1, -1)
     local pos = ns.db.barPosition
     if pos then bar:SetPoint("CENTER", UIParent, "BOTTOMLEFT", pos.x, pos.y)
     else bar:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 180) end
@@ -35,8 +36,9 @@ local function createBar()
     for index in ipairs(families) do
         local button = makeButton(index, "SecureActionButtonTemplate")
         buttons[index] = button
-        button:RegisterForClicks("LeftButtonDown", "LeftButtonUp")
+        button:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonDown", "RightButtonUp")
         button:SetAttribute("type1", "item")
+        button:SetAttribute("type2", "item")
         button.count = button:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
         button.count:SetPoint("BOTTOMRIGHT", -1, 1)
         button:SetScript("OnEnter", function(self)
