@@ -4,15 +4,15 @@ local families = ns.poisonFamilies
 
 local bar, buttons = nil, {}
 local size, spacing = 32, 3
+local verticalLayout
 
 function ns.setPoisonWarning(text)
     if bar and bar.poisonWarning:GetText() ~= text then bar.poisonWarning:SetText(text) end
 end
 
-local function makeButton(index, template)
+local function makeButton(template)
     local button = CreateFrame("Button", nil, bar, template)
     button:SetSize(size, size)
-    button:SetPoint("LEFT", bar, "LEFT", (index - 1) * (size + spacing), 0)
     button.icon = button:CreateTexture(nil, "ARTWORK")
     button.icon:SetAllPoints()
     button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
@@ -20,9 +20,23 @@ local function makeButton(index, template)
     return button
 end
 
+local function layoutBar(vertical)
+    local length = #buttons * (size + spacing) - spacing
+    bar:SetSize(vertical and size or length, vertical and length or size)
+    for index, button in ipairs(buttons) do
+        local offset = (index - 1) * (size + spacing)
+        button:ClearAllPoints()
+        if vertical then
+            button:SetPoint("TOP", bar, "TOP", 0, -offset)
+        else
+            button:SetPoint("LEFT", bar, "LEFT", offset, 0)
+        end
+    end
+    verticalLayout = vertical
+end
+
 local function createBar()
     bar = CreateFrame("Frame", nil, UIParent)
-    bar:SetSize((#families + 1) * (size + spacing) - spacing, size)
     bar:SetClampedToScreen(true)
     bar:SetMovable(true)
     bar.poisonWarning = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -34,7 +48,7 @@ local function createBar()
     else bar:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 180) end
 
     for index in ipairs(families) do
-        local button = makeButton(index, "SecureActionButtonTemplate")
+        local button = makeButton("SecureActionButtonTemplate")
         buttons[index] = button
         button:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonDown", "RightButtonUp")
         button:SetAttribute("type1", "item")
@@ -48,7 +62,8 @@ local function createBar()
         end)
     end
 
-    local book = makeButton(#families + 1)
+    local book = makeButton()
+    buttons[#families + 1] = book
     book.icon:SetTexture("Interface\\Icons\\Trade_BrewPoison")
     book:SetScript("OnClick", function()
         if InCombatLockdown() then return end
@@ -82,6 +97,8 @@ function ns.updateActionBar()
             return
         end
         if not bar then createBar() end
+        local vertical = ns.db.verticalActionBar == true
+        if verticalLayout ~= vertical then layoutBar(vertical) end
         bar:Show()
     end
     if not bar or not bar:IsShown() then return end
