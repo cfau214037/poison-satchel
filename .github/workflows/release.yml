@@ -1,24 +1,57 @@
 name: Build addon release
 
 on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag (for example, v0.3.10)
+        required: true
+        type: string
   push:
     tags:
       - 'v*.*.*'
+  create:
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: github.event_name != 'create' || (github.ref_type == 'branch' && startsWith(github.ref_name, 'release/v'))
     runs-on: ubuntu-latest
+    env:
+      RELEASE_REF: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.sha }}
           persist-credentials: false
       - name: Build addon ZIP
         shell: pwsh
-        run: ./scripts/Build-Addon.ps1 -Tag $env:GITHUB_REF_NAME
+        run: |
+          $tag = $env:RELEASE_REF -creplace '^release/', ''
+          ./scripts/Build-Addon.ps1 -Tag $tag
+          Add-Content -LiteralPath $env:GITHUB_ENV -Value "RELEASE_TAG=$tag"
+
+      - name: Create release tag
+        if: github.event_name == 'create'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" --silent; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+              -f "ref=refs/tags/$RELEASE_TAG" -f "sha=$GITHUB_SHA" --silent
+          fi
+          tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)
+          test "$tag_sha" = "$GITHUB_SHA"
+
       - name: Publish ZIP on GitHub
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" "dist/PoisonSatchel-${GITHUB_REF_NAME}.zip" --verify-tag --title "Poison Satchel $GITHUB_REF_NAME" --generate-notes
+        run: |
+          archive="dist/PoisonSatchel-${RELEASE_TAG}.zip"
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$archive" --clobber
+          else
+            gh release create "$RELEASE_TAG" "$archive" --verify-tag --title "Poison Satchel $RELEASE_TAG" --generate-notes
+          fi

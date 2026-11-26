@@ -37,7 +37,7 @@ Preferences are under **Settings → AddOns → Poison Satchel**. **Poison expir
 
 ## Publishing a release
 
-Set the version in `PoisonSatchel/PoisonSatchel_Forever.toc` and commit the changes. Tag that commit with the matching version (for example, `v0.3.8`) and push the tag to GitHub. The release workflow checks the tag against the TOC, packages the addon and license, and attaches the ZIP to a GitHub Release.
+Set the version in `PoisonSatchel/PoisonSatchel_Forever.toc` and push the release commit to `main`. Create a branch from that commit named `release/vX.Y.Z`, such as `release/v0.3.10`. GitHub Actions checks the version against the TOC, builds the ZIP, creates the matching tag, and publishes the release. Pushing a matching tag directly also triggers the workflow.
 
 For CurseForge, upload the attached `PoisonSatchel-vX.Y.Z.zip` from the release. To build the same file locally, run `./scripts/Build-Addon.ps1` in PowerShell 7. The ZIP is written to `dist/`.
 
