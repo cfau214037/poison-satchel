@@ -1,5 +1,5 @@
 local addonName, ns = ...
-local panel, recipeButton, amount, rankCheck, status, buy, craft, portrait
+local panel, recipeButton, amount, fillStack, rankCheck, status, buy, craft, portrait
 local autoOpened, dismissed, bookOpen, displayedCost
 local rows, watched = {}, {}
 
@@ -53,13 +53,14 @@ function ns.refresh()
     recipeButton:SetEnabled(r ~= nil and not busy)
     rankCheck:SetEnabled(not busy)
     amount:SetEnabled(not busy)
+    fillStack:SetEnabled(r ~= nil and not busy)
     rankCheck:SetChecked(ns.db.showAllRanks)
     buy:Disable()
     craft:Disable()
     craft:SetText(r and "Prepare craft" or "Load recipes")
     if not r or not n then
         renderRows({})
-        status:SetText(r and "Enter 1–99 crafts." or "Load your learned poisons to get started.")
+        status:SetText(ns.notice or (r and "Enter 1–99 crafts." or "Load your learned poisons to get started."))
         craft:SetEnabled(not r and not InCombatLockdown())
         return
     end
@@ -146,6 +147,31 @@ function ns.open()
         amount:SetText("1")
         amount:SetScript("OnEscapePressed",amount.ClearFocus)
         amount:SetScript("OnEnterPressed",amount.ClearFocus)
+
+        fillStack = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+        fillStack:SetSize(86, 22)
+        fillStack:SetPoint("LEFT", amount, "RIGHT", 9, 0)
+        fillStack:SetText("Fill Stack")
+        fillStack:SetScript("OnClick", function()
+            local recipe = ns.selection()
+            if not recipe or ns.order or ns.pendingCraft then return end
+            amount:ClearFocus()
+            local crafts = ns.stackCrafts(recipe)
+            if crafts then
+                amount:SetNumber(crafts)
+            else
+                ns.notice = "Open your Poisons profession to refresh this recipe."
+                ns.refresh()
+            end
+        end)
+        fillStack:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_TOP")
+            GameTooltip:SetText("Fill Stack")
+            GameTooltip:AddLine("Set Crafts to reach the next multiple of 20 in your bags.", 1, 1, 1)
+            GameTooltip:Show()
+        end)
+        fillStack:SetScript("OnLeave", GameTooltip_Hide)
+
         rankCheck = CreateFrame("CheckButton",nil,panel,"UICheckButtonTemplate")
         rankCheck:SetSize(24,24)
         rankCheck:SetPoint("TOPLEFT",215,-73)

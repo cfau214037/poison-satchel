@@ -2,6 +2,7 @@ local _, ns = ...
 PoisonSatchel = ns
 local trade = C_TradeSkillUI
 local POISONS = 40
+local POISON_STACK_SIZE = 20
 
 -- Item IDs within each family are ordered from lowest to highest rank.
 ns.poisonFamilies = {
@@ -66,6 +67,17 @@ function ns.selection()
         end
     end
     return choices[1]
+end
+
+function ns.stackCrafts(recipe)
+    if not recipe.outputItemID and trade and trade.GetRecipeSchematic then
+        -- Recipes saved before Fill Stack only have reagent data.
+        local schematic = trade.GetRecipeSchematic(recipe.id, false)
+        recipe.outputItemID = schematic and schematic.outputItemID
+    end
+    if not recipe.outputItemID then return end
+    local have = C_Item.GetItemCount(recipe.outputItemID, false)
+    return POISON_STACK_SIZE - (have % POISON_STACK_SIZE)
 end
 
 -- Blizzard owns recipe selection and the final Create click.
@@ -139,7 +151,7 @@ local function readRecipe(id, info)
         end
     end
     if next(materials) then
-        return {id = id, name = info.name, icon = info.icon, materials = materials}
+        return {id = id, name = info.name, icon = info.icon, materials = materials, outputItemID = schematic.outputItemID}
     end
 end
 

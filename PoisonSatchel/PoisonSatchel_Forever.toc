@@ -2,7 +2,7 @@
 ## Game: forever
 ## Title: Poison Satchel
 ## IconTexture: Interface\AddOns\PoisonSatchel\Textures\Logo
-## Version: 0.3.10
+## Version: 0.3.11
 ## Author: Chris
 ## Notes: Buy ingredients and craft learned rogue poisons.
 ## SavedVariablesPerCharacter: PoisonSatchelDB, VenomSatchelDB
