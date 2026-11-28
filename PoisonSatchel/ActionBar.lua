@@ -50,14 +50,20 @@ local function createBar()
     for index in ipairs(families) do
         local button = makeButton("SecureActionButtonTemplate")
         buttons[index] = button
-        button:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonDown", "RightButtonUp")
+        button:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonUp")
         button:SetAttribute("type1", "item")
-        button:SetAttribute("type2", "item")
+        button:SetScript("PostClick", function(self, mouse)
+            if mouse == "RightButton" then ns.openPoisonTargetMenu(self, self.boundID) end
+        end)
+        button:SetScript("OnHide", function(self) ns.closeWeaponMenuFor(self) end)
         button.count = button:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
         button.count:SetPoint("BOTTOMRIGHT", -1, 1)
         button:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_TOP")
             GameTooltip:SetItemByID(self.displayID)
+            if C_Item.GetItemCount(self.displayID, false) > 0 then
+                GameTooltip:AddLine("Right-click to choose a weapon.", 1, 1, 1)
+            end
             GameTooltip:Show()
         end)
     end

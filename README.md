@@ -18,7 +18,9 @@ Outside combat, right-click an equipped main-hand or off-hand weapon to see the 
 
 ## Poison action bar
 
-The bar has one slot each for Instant, Deadly, Wound, Crippling, and Mind-numbing Poison. A colored icon shows the highest rank in your bags and how many you have of that rank. A gray icon means you have none of that poison. Left-click or right-click a stocked poison, then select the weapon to coat.
+The bar has one slot each for Instant, Deadly, Wound, Crippling, and Mind-numbing Poison. A colored icon shows the highest rank in your bags and how many you have of that rank. A gray icon means you have none of that poison.
+
+Outside combat, **right-click** a stocked poison and choose **Main Hand** or **Off Hand** from the **Apply to...** menu. Press **Esc** to dismiss the menu. A hand without a weapon is grayed out. To select a weapon manually, **left-click** the poison.
 
 Click the **Poisons crafting icon** at the end of the bar to open the profession. Right-drag that icon to move the bar. Its position is saved per character.
 
